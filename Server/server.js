@@ -5,42 +5,37 @@ const app = express();
 const connection = require("./db/config.js");
 const cookieParser = require('cookie-parser')
 const path = require("path");
+const ip = require('ip')
+const { corsOptions } = require("./utils/helper.js");
+const port = process.env.PORT || 8000;
+const userRouter = require('./routes/user.routes.js')
 
-//database connection
-connection();
 app.use(express.json())
 app.use(cookieParser())
-
+app.use(cors(corsOptions)); 
 app.use((err, req, res, next) => {
 	console.error(err.stack);
 	res.status(500).send('Something went wrong!');
   });
+  app.use('/api/user', userRouter)
   
 
 //middlewares
 app.use(express.json());
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:4000",
-];
 
 
-const corsOptions = {
-	origin: (origin, callback) => {
-		if (allowedOrigins.includes(origin) || !origin) {
-			callback(null, true);
-		} else {
-			callback(new Error("Not allowed by CORS"));
-		}
-	},
-	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-	optionsSuccessStatus: 204,
-	credentials: true, // Allow credentials like cookies
-};
-app.use(cors(corsOptions)); 
 
-const port = process.env.PORT || 8000;
-const server = app.listen(port, () => console.log(`Application Running on Port ${port}`));
+const server = app.listen(port, async () => {
+	try {
+	  await connection;
+	  console.log("Mogno Atlas Connected");
+	console.log(`Sever is running at ${port}`);
+  
+	} catch (error) {
+	  console.log("error", error)
+	  console.log("Mongo connection error");
+	}
+  });
 
 app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
 
@@ -51,3 +46,6 @@ app.get('/*', (req, res) => {
 		}
 	});
 });
+
+
+console.log("app is running on ip " + ip.address())

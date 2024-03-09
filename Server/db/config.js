@@ -1,11 +1,8 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-module.exports = async () => {
-  try {
-    await mongoose.connect(process.env.DB);
-    console.log("DB CONNECTED SUCCESSFULLY")
-  } catch (error) {
-    console.log(error)
-    console.log("COULD NOT CONNECT TO DB")
-  }
-}
+const uri = process.env.mongoURL;
+
+var connection = mongoose.connect(uri, { maxPoolSize: 1000 });
+
+module.exports = { connection };
