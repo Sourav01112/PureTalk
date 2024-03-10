@@ -1,8 +1,10 @@
 const jwt = require("jsonwebtoken");
 
-async function protect(req) {
+async function Authenticate(req) {
   return new Promise((resolve, reject) => {
     const token = req.cookies?.authToken;
+
+    console.log({token});
     if (token) {
       jwt.verify(token, process.env.JWTPRIVATEKEY, {}, (err, userData) => {
         if (err) {
@@ -17,4 +19,4 @@ async function protect(req) {
   });
 }
 
-module.exports = protect;
+module.exports = Authenticate;

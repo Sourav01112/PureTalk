@@ -2,20 +2,20 @@ const nodemailer = require("nodemailer");
 
 const SendEmail = async (email, subject, text) => {
 
-console.log({email, subject, text});
+  console.log({ email, subject, text });
 
-// return 
+  // return 
 
 
   try {
     const transporter = nodemailer.createTransport({
-      // host: process.env.HOST,
-      service: process.env.SERVICE,
-      // port: 587,
+      host: 'smtp.zoho.in',
+      port: 465,
+      secure: true,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
+        user: 'info@souravcodes.in',
+        pass: 'Z2dJEa5Bwdd8'
+      }
     });
 
     await transporter.sendMail({
@@ -28,8 +28,8 @@ console.log({email, subject, text});
     console.log(`Email sent to ${email}`);
   } catch (error) {
     console.error(error);
-    console.error(`Error sending mail to ${email}`);
-    throw error; 
+    console.error(`Error sending mail to error`, error);
+    throw error;
   }
 };
 

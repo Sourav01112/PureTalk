@@ -2,12 +2,17 @@
 
 const allowedOrigins = [
 	"http://localhost:5173",
-	"http://localhost:4000",
+	"http://localhost:8001",
+	"http://192.168.0.108:5173",
+	"http://192.168.0.108:8001"
+
 	// add here the production URL
 ];
 
 const corsOptions = {
 	origin: (origin, callback) => {
+
+console.log({origin, callback});
 		if (allowedOrigins.includes(origin) || !origin) {
 			callback(null, true);
 		} else {

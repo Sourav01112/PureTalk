@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  ScrollRestoration,
+} from "react-router-dom";
+import "./App.css";
+import { Toaster } from "react-hot-toast";
+import { AuthProvider, useAuth } from "./context/authContext";
+import axios from "axios";
+import { ProfileProvider } from "./context/profileContext";
+import { useEffect } from "react";
+import { baseUrl } from "./api/api";
+import Home from "./pages/Home";
 
-function App() {
-  const [count, setCount] = useState(0)
+const Layout = () => {
+  const { isAuthenticated, checkAuth } = useAuth();
+
+  useEffect(() => {
+    checkAuth();
+  }, [isAuthenticated]);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ScrollRestoration />
+      <Outlet />
     </>
-  )
+  );
+};
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+    ],
+  },
+]);
+
+function App() {
+  axios.defaults.baseURL = baseUrl;
+  axios.defaults.withCredentials = true;
+
+  return (
+    <>
+      <AuthProvider>
+        <ProfileProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </ProfileProvider>
+      </AuthProvider>
+    </>
+  );
 }
 
-export default App
+export default App;
