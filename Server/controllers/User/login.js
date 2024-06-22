@@ -2,6 +2,10 @@ const bcrypt = require("bcrypt");
 const { UserModel, validateLogin } = require("../../models/user.model");
 
 const loginController = async (req, res) => {
+
+
+  console.log(req.body)
+
   try {
     const { error } = validateLogin(req.body);
 
@@ -21,25 +25,32 @@ const loginController = async (req, res) => {
       req.body.password,
       user.password
     );
-    if (!validPassword) {
+    // Check if the user's email is verified
+    if (!user.verified) {
+      return res.status(400).send({ message: "Email Verification is still pending" });
+    }
+
+    else if (!validPassword) {
       return res.status(401).send({ message: "Invalid Password" });
     }
 
-    // Check if the user's email is verified
-    if (!user.verified) {
-      return res.status(400).send({ message: "User doesn't exist" });
-    }
 
     // Generate authentication token and send successful login response
     const token = user.generateAuthToken();
+
+    let cookieOption = {
+      httpOnly: true,
+      sameSite: 'None',
+      secure: false,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    }
+
+    // if ((process.env.NODE_ENV == "production")) cookieOption.secure = true
+
+    res.cookie("authToken", token, cookieOption)
+
     res
       .status(200)
-      .cookie("authToken", token, {
-        httpOnly: false,
-        sameSite: "none",
-        secure: true,
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      })
       .send({ message: "Login successful", status: 200 });
     return;
   } catch (error) {

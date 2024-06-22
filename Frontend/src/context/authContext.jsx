@@ -1,17 +1,26 @@
 import Cookies from "js-cookie";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const setAuthenticated = (value) => {
     setIsAuthenticated(value);
   };
+
+  const token = document.cookie;
+  // .split("; ")
+  // .find((row) => row.startsWith("authToken="))
+  // .split("=")[1];
+  console.log("authToken>>>>>>>:", token);
+
   const checkAuth = () => {
     const token = Cookies.get("authToken");
-    console.log("Checking authentication...");
-    if (token) {
+    console.log("{ token }", token);
+
+    if (token !== null && token !== undefined) {
       console.log("Token exists. Setting authenticated to true.");
       setAuthenticated(true);
       console.log(isAuthenticated);
@@ -25,6 +34,15 @@ export const AuthProvider = ({ children }) => {
     Cookies.remove("authToken");
     setAuthenticated(false);
   };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    console.log("Authentication state changed:", isAuthenticated);
+  }, [isAuthenticated]);
+
   return (
     <AuthContext.Provider
       value={{ isAuthenticated, setAuthenticated, checkAuth, logout }}

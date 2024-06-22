@@ -18,7 +18,12 @@ const AvatarRouter = require('./routes/avatar.routes.js')
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend origin
+  credentials: true // Allow credentials (cookies)
+}));
+
 app.use(express.json());
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -28,7 +33,7 @@ app.use((err, req, res, next) => {
 //  Routes Definition
 app.use("/api/user", userRouter);
 app.use("/api/chat", MessageRouter);
-app.use("/api/avatar",AvatarRouter );
+app.use("/api/avatar", AvatarRouter);
 
 
 
